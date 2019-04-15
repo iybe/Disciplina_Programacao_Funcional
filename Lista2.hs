@@ -1,3 +1,14 @@
+-- lista 2
+
+--    ______________    _____________    ______________   ___            _____________   ___      ___ 
+--    \_____   _____\   \   _________\   \   __________\  \  \           \   _________\  \  \    /  /
+--          \  \         \  \             \  \             \  \           \  \            \  \  /  /
+--           \  \         \  \______       \  \___________  \  \           \  \______      \  \/  /
+--            \  \         \   _____\       \___________  \  \  \           \   _____\      \    /
+--             \  \         \  \                        \  \  \  \           \  \            \   \
+--        ______\  \_____    \  \__________    __________\  \  \  \_________  \  \__________  \   \ 
+--        \______________\    \____________\   \_____________\  \___________\  \____________\  \___\
+
 -- 1 
 paridade :: [Bool] -> Bool
 paridade [] = False
@@ -45,6 +56,34 @@ valornaposicao v pos (p:l) | pos == 0 = [v]++l
 swap :: [Int] -> Int -> Int -> [Int]
 swap l a b = (valornaposicao (l !! (max a b)) (min a b) (nprim ((min a b)+1) l) )++(valornaposicao (l !! (min a b)) ((max a b)-((min a b)+1)) (nult ((length l)-(min a b)-1) l) )
 
+-- 5
+cond_a :: [Int] -> Int -> Int
+cond_a (p:l) ia | l == [] = -1
+                | p > (l !! 0) = ia
+                | otherwise = (cond_a l (ia-1))
+
+abs_cond_a :: [Int] -> Int
+abs_cond_a l = (cond_a (reverse l) ((length l) - 2))
+
+cond_b :: Int -> [Int] -> Int -> Int
+cond_b val (p:l) ia | p > val = ia
+                    | otherwise = (cond_b val l (ia-1))
+
+abs_cond_b :: Int -> [Int] -> Int
+abs_cond_b i u = (cond_b (u !! i) (reverse ((nult ((length u)-i-1)) u)) ((length u)-1) )
+
+cond_d :: [Int] -> Int -> [Int]
+cond_d u i = ((nprim (i+1) u)++(reverse (nult ((length u)-i-1) u)))
+
+nextPerm :: [Int] -> [Int]
+nextPerm l = (cond_d (swap l (abs_cond_a l) (abs_cond_b (abs_cond_a l) l)) (abs_cond_a l) )
+
+-- 6
+
+allPerms :: [Int] -> [[Int]]
+allPerms l | (abs_cond_a l) == -1 = [l]
+           | otherwise = ([l]++(allPerms (nextPerm l))) 
+
 -- 7
 
 bbin :: [Int] -> Int -> Int -> Int
@@ -63,3 +102,14 @@ listaacum (p:l) = ([p+(sum l)]++(listaacum l))
 
 listacc :: [Int] -> [Int]
 listacc l = (reverse (listaacum (reverse l))) 
+
+-- 10
+listamax :: [Int] -> Int -> [Int] -> [Int] -> [Int]
+listamax [] _ lm _ = lm
+listamax (p:l) va lm lac | (va + p) > (sum lm) = (listamax l (va+p) (lac++[p]) (lac++[p]))
+                         | p > 0 = (listamax l (va+p) lm (lac++[p]))
+                         | (va+p) > 0 = (listamax l (va+p) lm (lac++[p]))
+                         | otherwise = (listamax l 0 lm [])
+
+maxsseq :: [Int] -> [Int]
+maxsseq l = (listamax l 0 [] [])
