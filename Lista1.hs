@@ -264,8 +264,8 @@ upper s = [if a `elem` ['a'..'z'] then (maiuscula a) else a | a <- s]
 
 --split :: [Char] -> Char -> [[Char]]
 
-titulo :: [Char] -> [Char]
-titulo s = [if ((indice a 0 s) == 0 || (s !! ((indice a 0 s) - 1)) == ' ') then (maiuscula a) else a | a <- s]
+--titulo :: [Char] -> [Char]
+--titulo s = [if ((indice a 0 s) == 0 || (s !! ((indice a 0 s) - 1)) == ' ') then (maiuscula a) else a | a <- s]
 
 --31. selec
 --INPUT: Uma lista qualquer u e uma lista de posições P
@@ -282,3 +282,20 @@ isPalind (p:s) | length s == 0 = True
                | p == (last s) = isPalind (init s)
                | otherwise = False
 
+-- 34
+
+sdig :: Int -> Int
+sdig 0 = 0
+sdig n = (n-((div n 10)*10))+(sdig (div n 10))
+
+-- 36
+
+solvecompac :: Int -> [Int] -> [[Int]]
+solvecompac ac (p:[]) | ac == 0 = [[p]]
+                      | otherwise = [[ac+1,p]]
+solvecompac ac (p:l) | (l !! 0) == p = (solvecompac (ac+1) l)
+                     | ac == 0 = [[p]]++(solvecompac 0 l)
+                     | otherwise = ([[ac+1,p]]++(solvecompac 0 l))
+
+compac :: [Int] -> [[Int]]
+compac l = (solvecompac 0 l)
