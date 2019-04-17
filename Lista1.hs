@@ -262,10 +262,21 @@ upper s = [if a `elem` ['a'..'z'] then (maiuscula a) else a | a <- s]
 --em caixa baixa exceto aqueles que, por serem
 --iniciais de palavras, devem aparecer em caixa alta
 
---split :: [Char] -> Char -> [[Char]]
+minusculo :: Char -> Char
+minusculo c = ['a'..'z'] !! (indice c 0 ['A'..'Z'])
 
---titulo :: [Char] -> [Char]
---titulo s = [if ((indice a 0 s) == 0 || (s !! ((indice a 0 s) - 1)) == ' ') then (maiuscula a) else a | a <- s]
+down :: [Char] -> [Char]
+down s = [if a `elem` ['A'..'Z'] then (minusculo a) else a | a <- s]
+
+solvetitle :: [Char] -> Int -> Char -> [Char]
+solvetitle [] _ _ = []
+solvetitle (p:l) ia ca | ia == 0 = (upper [p])++(solvetitle l (ia+1) p)
+                       | (ca == ' ') && (p /= ' ') = (upper [p])++(solvetitle l (ia+1) p)
+                       | (ca /= ' ') = (down [p])++(solvetitle l (ia+1) p)
+                       | otherwise = [p]++(solvetitle l (ia+1) p)
+
+titulo :: [Char] -> [Char]
+titulo s = solvetitle s 0 ' '
 
 --31. selec
 --INPUT: Uma lista qualquer u e uma lista de posições P
@@ -282,11 +293,51 @@ isPalind (p:s) | length s == 0 = True
                | p == (last s) = isPalind (init s)
                | otherwise = False
 
+-- 33
+
+primo :: Int -> Bool
+primo 1 = False
+primo n = ((length [c | c <- [2..(n-1)],(mod n c) == 0] ) == 0)
+
 -- 34
 
 sdig :: Int -> Int
 sdig 0 = 0
 sdig n = (n-((div n 10)*10))+(sdig (div n 10))
+
+-- 35
+
+nprim :: Int -> [Int] -> [Int]
+nprim _ [] = []
+nprim n (p:l) | n == 0 = []
+              | otherwise = [p]++(nprim (n-1) l)
+
+nult :: Int -> [Int] -> [Int]
+nult _ [] = []
+nult n (p:l) | n == 0 = []
+             | n > length l = p:l
+             | n < length l = nult n l
+             | otherwise = l
+
+valornaposicao :: Int -> Int -> [Int] -> [Int]
+valornaposicao _ _ [] = []
+valornaposicao v pos (p:l) | pos == 0 = [v]++l
+                           | otherwise = [p]++(valornaposicao v (pos-1) l)
+
+swap :: [Int] -> Int -> Int -> [Int]
+swap l a b = (valornaposicao (l !! (max a b)) (min a b) (nprim ((min a b)+1) l) )++(valornaposicao (l !! (min a b)) ((max a b)-((min a b)+1)) (nult ((length l)-(min a b)-1) l) )
+
+valorindmenor :: [Int] -> Int -> Int -> Int -> [Int]
+valorindmenor [] v im _ = [v,im]
+valorindmenor (p:l) v im ia | p < v = (valorindmenor l p ia (ia+1))
+                            | otherwise = (valorindmenor l v im (ia+1))
+
+solvebubble :: [Int] -> Int -> [Int]
+solvebubble [] _ = []
+solvebubble l ia = [((valorindmenor l (l !! 0) ia ia) !! 0)]++(solvebubble (nult ((length l)-1) (swap l (ia) ((valorindmenor l (l !! 0) ia ia) !! 1))) (ia))
+
+bubblesort :: [Int] -> [Int]
+bubblesort l = solvebubble l 0
 
 -- 36
 
@@ -299,3 +350,66 @@ solvecompac ac (p:l) | (l !! 0) == p = (solvecompac (ac+1) l)
 
 compac :: [Int] -> [[Int]]
 compac l = (solvecompac 0 l)
+
+-- 37
+listapares :: [Int] -> [Int]
+listapares [] = []
+listapares (p:l) | (mod p 2) == 0 = [p]++(listapares l)
+                 | otherwise = (listapares l) 
+
+listaimpares :: [Int] -> [Int]
+listaimpares [] = []
+listaimpares (p:l) | not ((mod p 2) == 0) = [p]++(listaimpares l)
+                   | otherwise = (listaimpares l)
+
+splitlints :: [Int] -> [[Int]]
+splitlints l = [listapares l]++[listaimpares l]
+
+-- 39
+
+numnabase :: Int -> Char
+numnabase n = (['0'..'9']++['A'..'Z']) !! n
+
+primpotmqn :: Int -> Int -> Int -> Int
+primpotmqn n ba e | (ba^e) > n = (ba^(e-1))
+                  | otherwise = (primpotmqn n ba (e+1))
+
+baseprimpotmqn :: Int -> Int -> Int -> Int
+baseprimpotmqn n ba e | (ba^e) > n = (e-1)
+                      | otherwise = (baseprimpotmqn n ba (e+1))
+
+repete :: Int -> Char -> [Char]
+repete n c | n == 0 = []
+           | otherwise = [c]++(repete (n-1) c)
+
+sbase :: Int -> Int -> Int -> [Char]
+sbase 0 _ e = (repete (e+1) '0')
+sbase n b e | (b^e) > n = ['0']++(sbase n b (e-1))
+            | otherwise = [(numnabase (div n (primpotmqn n b 0)))]++(sbase (mod n (primpotmqn n b 0)) b (e-1))
+
+base :: Int -> Int -> [Char]
+base n b = sbase n b (baseprimpotmqn n b 0)
+
+-- 40
+gerarsub :: [Char] -> [Int] -> [Int]
+gerarsub [] _ = []
+gerarsub (p:r) (pi:l) | p == '1' = [pi]++(gerarsub r l)
+                      | otherwise = (gerarsub r l)
+
+gerartdsubs :: Int -> [Int] -> [[Int]]
+gerartdsubs na l | na == (2^(length l)) = []
+                 | otherwise = [(bubblesort (gerarsub (( repete ((length l)-(length (base na 2))) '0' )++(base na 2)) l))]++(gerartdsubs (na+1) l)
+
+existel :: [Int] -> [[Int]] -> Bool
+existel _ [] = False
+existel p (o:l) | p == o = True
+                | otherwise = (existel p l)
+
+retiraiguais :: [[Int]] -> [[Int]]
+retiraiguais [] = []
+retiraiguais (p:l) | (existel p l) = (retiraiguais l)
+                   | otherwise = [p]++(retiraiguais l) 
+
+partes :: [Int] -> [[Int]]
+partes l = (retiraiguais (gerartdsubs 0 l))
+
