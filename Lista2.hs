@@ -95,6 +95,29 @@ bbin l v ac | (l !! (div (length l) 2)) == v = (ac+(div (length l) 2))
 buscabin :: [Int] -> Int -> Int
 buscabin l v = (bbin l v 0)
 
+-- 8
+
+primo :: Int -> Bool
+primo 1 = False
+primo n = ((length [c | c <- [2..(n-1)],(mod n c) == 0] ) == 0)
+
+lp :: Int -> [Int]
+lp n = [p | p <- [1..n],primo p]
+
+qtdvezdiv :: Int -> Int -> Int -> Int
+qtdvezdiv 0 _ _ = 0
+qtdvezdiv n di q | ((mod n di) /= 0) = q
+                 | otherwise = (qtdvezdiv (div n di) di (q+1))
+
+solvefact :: Int -> [Int] -> [[Int]]
+solvefact _ [] = []
+solvefact 0 _ = []
+solvefact n (p:l) | (qtdvezdiv n p 0) == 0 = (solvefact n l)
+                  | otherwise = [[p,(qtdvezdiv n p 0)]]++(solvefact (div n (p^( qtdvezdiv n p 0))) l) 
+
+factors :: Int -> [[Int]]
+factors n = (solvefact n (lp n))
+
 -- 9
 listaacum :: [Int] -> [Int]
 listaacum [] = []

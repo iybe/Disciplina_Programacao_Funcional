@@ -227,6 +227,28 @@ isSorted (p:u) | u == [] = True
 --INPUT: Lista u de objetos ordenáveis
 --OUTPUT: Lista ordenada das chaves de u pelo método de ordenação rápida
 
+menoresq :: Int -> [Int] -> [Int]
+menoresq pi [] = []
+menoresq pi (p:l) | p <= pi = [p]++(menoresq pi l)
+                  | otherwise = (menoresq pi l)
+
+maiorque :: Int -> [Int] -> [Int]
+maiorque pi [] = []
+maiorque pi (p:l) | p > pi = [p]++(maiorque pi l)
+                  | otherwise = (maiorque pi l)
+
+opivo :: [Int] -> Int
+opivo l = (l !! (div (length l) 2))
+
+listasemp :: [Int] -> Int -> [Int]
+listasemp [] _ = []
+listasemp (pr:l) p | pr == p = l
+                   | otherwise = [pr]++(listasemp l p)
+
+qsort :: [Int] -> [Int]
+qsort l | ((length l) == 0) || ((length l) == 1) = l
+        | otherwise = (qsort ( menoresq (opivo l) (listasemp l (opivo l)) ))++[(opivo l)]++(qsort (maiorque (opivo l) (listasemp l (opivo l)) ))
+
 --27. rotEsq
 --INPUT: Um natural n e uma lista ou string S
 --OUTPUT: Lista S rotacionada n vezes à esquerda
@@ -364,6 +386,11 @@ listaimpares (p:l) | not ((mod p 2) == 0) = [p]++(listaimpares l)
 
 splitlints :: [Int] -> [[Int]]
 splitlints l = [listapares l]++[listaimpares l]
+
+-- 38
+
+perfeito :: Int -> Bool
+perfeito n = (n `elem` [(e^2) | e <- [1..n], (e^2) `elem` [1..n]])
 
 -- 39
 
