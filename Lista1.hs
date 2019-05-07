@@ -180,11 +180,7 @@ intercal (p:a) (s:b) | a == [] || b == [] = [p,s]++a++b
 --OUTPUT: Lista das chaves de a e b sem repetição
 
 uniao :: [Int] -> [Int] -> [Int]
-uniao (p:a) (s:b) | a == [] || b == [] = [p,s]++a++b
-                  | ((frequencia (a++b) p) == 0) && ((frequencia (a++b) s) == 0) = [p,s]++(uniao a b)
-                  | ((frequencia (a++b) p) == 0) && not((frequencia (a++b) s) == 0) = [p]++(uniao a b)
-                  | not((frequencia (a++b) p) == 0) && ((frequencia (a++b) s) == 0) = [s]++(uniao a b)
-                  | otherwise = uniao a b
+uniao a b = a++[ x | x <- b , not(pertence a x)]
 
 --22. intersec
 --INPUT: Duas listas a e b sem repetição de chaves
