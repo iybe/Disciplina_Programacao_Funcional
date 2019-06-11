@@ -5,11 +5,9 @@ data OList a = Empty | Node a (OList a) deriving (Show,Eq)
 (>>>) valor (Node atual resto) | valor <= atual = Node valor (Node atual resto)
                                | otherwise = Node atual ((>>>) valor resto)
 
---wtf!
-hasKey :: (Ord a) => a -> OList a -> Bool
-hasKey _ Empty = False
+haskey :: (Ord a) => a -> OList a -> Bool
+haskey _ Empty = False
 haskey valor (Node p resto) | p == valor = True
-                            | resto == Empty = False
                             | otherwise = (haskey valor resto) 
 
 remkey :: (Ord a) => a -> OList a -> OList a
